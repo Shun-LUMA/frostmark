@@ -39,15 +39,13 @@ test("local file opening, duplicate headings, HTML safety, and tabs", async ({
   page,
 }) => {
   await page.goto("/");
-  await page
-    .locator("input[type=file]")
-    .setInputFiles({
-      name: "sample.md",
-      mimeType: "text/markdown",
-      buffer: Buffer.from(
-        "# Sample\n\n## Repeat\n\nA paragraph.\n\n## Repeat\n\n<script>window.PWNED=true</script>\n\n![private](https://example.invalid/track.png)",
-      ),
-    });
+  await page.locator("input[type=file]").setInputFiles({
+    name: "sample.md",
+    mimeType: "text/markdown",
+    buffer: Buffer.from(
+      "# Sample\n\n## Repeat\n\nA paragraph.\n\n## Repeat\n\n<script>window.PWNED=true</script>\n\n![private](https://example.invalid/track.png)",
+    ),
+  });
   await expect(
     page.getByRole("heading", { name: "Sample", exact: true }),
   ).toBeVisible();
@@ -56,13 +54,11 @@ test("local file opening, duplicate headings, HTML safety, and tabs", async ({
   await expect(
     page.getByText("Remote image blocked for privacy", { exact: true }),
   ).toBeVisible();
-  await page
-    .locator("input[type=file]")
-    .setInputFiles({
-      name: "second.md",
-      mimeType: "text/markdown",
-      buffer: Buffer.from("# Second file"),
-    });
+  await page.locator("input[type=file]").setInputFiles({
+    name: "second.md",
+    mimeType: "text/markdown",
+    buffer: Buffer.from("# Second file"),
+  });
   await expect(page.getByRole("tab")).toHaveCount(2);
   await page.getByRole("tab", { name: "sample.md", exact: true }).click();
   await expect(
@@ -74,6 +70,26 @@ test("local file opening, duplicate headings, HTML safety, and tabs", async ({
   await expect(
     page.getByRole("heading", { name: "Second file", exact: true }),
   ).toBeVisible();
+});
+test("print styling remains readable when the app is dark", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByRole("button", { name: "Reading preferences", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Dark", exact: true }).click();
+  await page.emulateMedia({ media: "print" });
+  await expect(page.locator(".sidebar")).toBeHidden();
+  await expect(page.locator(".topbar")).toBeHidden();
+  await expect(page.locator("article > p").first()).toHaveCSS(
+    "color",
+    "rgb(54, 65, 82)",
+  );
+  await expect(page.locator(".codeblock code span").first()).toHaveCSS(
+    "color",
+    "rgb(23, 35, 49)",
+  );
 });
 test("keyboard controls and outline toggle", async ({ page }) => {
   await page.goto("/");

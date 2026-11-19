@@ -874,6 +874,21 @@ button.primary {
   }
 }
 @media print {
+  :root,
+  :root[data-theme="dark"] {
+    --bg: #fff;
+    --panel: #fff;
+    --panel2: #f0f3f5;
+    --line: #cbd2db;
+    --text: #172331;
+    --muted: #364152;
+    --accent: #205d7b;
+    --code: #f5f7fa;
+    color-scheme: light;
+  }
+  .codeblock code span {
+    color: #172331 !important;
+  }
   html,
   body,
   .app,
