@@ -1,5 +1,5 @@
 import { chromium } from "@playwright/test";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
@@ -24,7 +24,7 @@ await writeFile(
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const before = hash(await readFile(fixture));
 const exe = path.resolve("src-tauri/target/release/frostmark.exe");
-let browser, child;
+let browser, child, lastConnectionError;
 const errors = [];
 try {
   child = spawn(exe, [fixture], {
@@ -37,15 +37,21 @@ try {
   child.on("error", (e) => errors.push(String(e)));
   for (let i = 0; i < 90; i++) {
     try {
-      browser = await chromium.connectOverCDP("http://127.0.0.1:9222");
+      browser = await chromium.connectOverCDP("http://127.0.0.1:9222", {
+        timeout: 2000,
+      });
       break;
-    } catch {
+    } catch (error) {
+      lastConnectionError = String(error);
       if (child.exitCode !== null)
         throw Error(`App exited with ${child.exitCode}`);
       await new Promise((r) => setTimeout(r, 1000));
     }
   }
-  assert(browser, "WebView2 debug connection did not become ready");
+  assert(
+    browser,
+    `WebView2 debug connection did not become ready (pid ${child.pid}, exit ${child.exitCode}): ${lastConnectionError}`,
+  );
   const context = browser.contexts()[0];
   let page = context.pages()[0];
   if (!page) page = await context.waitForEvent("page", { timeout: 15000 });
@@ -169,6 +175,18 @@ try {
     "Desktop smoke passed: real WebView2 renderer, startup file, tabs, code, tables, images, links, preferences and security.",
   );
 } catch (e) {
+  if (process.env.GITHUB_ACTIONS === "true")
+    spawnSync(
+      "powershell.exe",
+      [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/desktop-diagnostics.ps1",
+      ],
+      { stdio: "inherit", timeout: 15000 },
+    );
   if (browser) {
     try {
       await browser

@@ -23,17 +23,35 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: src-tauri -> target
+          cache-on-failure: true
       - run: npm ci
       - name: Frontend checks
         run: |
           npm run build
           npx playwright test
+      - name: Prepare WebView2 on the build runner
+        shell: pwsh
+        run: |
+          Invoke-WebRequest 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -OutFile "$env:RUNNER_TEMP/WebView2Setup.exe"
+          $setup = Start-Process "$env:RUNNER_TEMP/WebView2Setup.exe" -ArgumentList '/silent','/install' -Wait -PassThru
+          Write-Host "WebView2 bootstrapper exit code: $($setup.ExitCode)"
       - name: Rust tests
-        run: cargo test --manifest-path src-tauri/Cargo.toml --locked --release
+        run: cargo test --manifest-path src-tauri/Cargo.toml --locked --release --features custom-protocol
       - name: Build portable executable (no installer)
         run: npm run tauri:build -- --no-bundle
+      - name: Preserve compiled executable for diagnosis
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostic-executable
+          path: src-tauri/target/release/frostmark.exe
+          if-no-files-found: error
+          retention-days: 3
+      - name: Verify portable executable dependencies
+        run: node scripts/verify-pe.mjs
       - name: Desktop smoke test
         run: node scripts/desktop-smoke.mjs
+      - name: Collect third-party notices
+        run: node scripts/third-party-notices.mjs
       - name: Package portable folder
         shell: pwsh
         run: |
@@ -41,6 +59,7 @@ jobs:
           Copy-Item src-tauri/target/release/frostmark.exe artifacts/Frostmark/Frostmark.exe
           Copy-Item PORTABLE-README.txt artifacts/Frostmark/README.txt
           Copy-Item examples/welcome.md artifacts/Frostmark/Welcome.md
+          Copy-Item artifacts/THIRD-PARTY-NOTICES.txt artifacts/Frostmark/THIRD-PARTY-NOTICES.txt
           Compress-Archive -Path artifacts/Frostmark -DestinationPath artifacts/Frostmark-windows-x64-portable.zip
           $hash = (Get-FileHash artifacts/Frostmark-windows-x64-portable.zip -Algorithm SHA256).Hash.ToLower()
           "$hash  Frostmark-windows-x64-portable.zip" | Set-Content artifacts/SHA256SUMS.txt

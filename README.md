@@ -38,7 +38,7 @@ npm run tauri:build -- --no-bundle
 
 ## GitHub Actions
 
-The Windows portable workflow builds on `windows-latest`, runs Rust tests and an actual WebView2 desktop smoke test, and uploads a portable ZIP plus SHA-256 checksum. It runs on pushes to main and can be dispatched manually. It does **not** create a release or install anything on the user's machine. Artifacts expire after 30 days; keep a local copy.
+The Windows portable workflow builds on `windows-latest`, runs browser and Rust tests, verifies the x64 GUI executable's direct runtime imports, runs an actual WebView2 desktop smoke test, and uploads a portable ZIP plus SHA-256 checksum. The Visual C++ runtime is statically linked; WebView2 is supplied by the system. Dependency license notices are included in the ZIP. It runs on pushes to main and can be dispatched manually. It does **not** create a release or install anything on the user's machine. Artifacts expire after 30 days; keep a local copy.
 
 ```sh
 gh workflow run windows-portable.yml
