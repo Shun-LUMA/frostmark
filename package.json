@@ -2,6 +2,12 @@
   "name": "frostmark",
   "private": true,
   "version": "0.1.0",
+  "description": "A portable, read-only Markdown viewer for Windows",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Shun-LUMA/frostmark.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

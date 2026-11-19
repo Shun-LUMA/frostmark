@@ -8,7 +8,6 @@ GET STARTED
 
 REQUIREMENTS
 Windows 10/11 x64 with Microsoft Edge WebView2 Runtime installed.
-The runtime is already installed on the laptop this app was built for.
 This distribution does NOT bundle or install WebView2. An offline computer
 without it must have the runtime supplied separately.
 
@@ -52,7 +51,7 @@ Select Frostmark.exe. Windows may not offer association for every portable app.
 Do not move the executable afterward if you set it as the default handler.
 
 UNSIGNED BUILD
-This personal-use build is unsigned. Windows SmartScreen may warn about
+This build is unsigned. Windows SmartScreen may warn about
 an unrecognized app. Only run builds you trust. A SHA256SUMS.txt accompanies
 the ZIP to verify download integrity; a checksum is not a publisher signature.
 
@@ -60,3 +59,9 @@ PRIVACY
 No analytics, accounts, remote fonts, automatic updates or document uploads.
 Remote links and opt-in remote images contact third-party services.
 Windows and the installed WebView2 runtime have their own system behavior.
+
+LICENSE & SOURCE
+Frostmark is free and open-source software under the MIT License.
+See LICENSE.txt for the license and warranty disclaimer.
+Third-party software retains its own licenses; see THIRD-PARTY-NOTICES.txt.
+Source: https://github.com/Shun-LUMA/frostmark

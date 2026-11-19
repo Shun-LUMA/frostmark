@@ -8,3 +8,12 @@ playwright-report/
 frostmark-settings.json*
 Frostmark.WebView2/
 *.log
+
+# Credentials and signing keys must never be committed.
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.pem
+*.key

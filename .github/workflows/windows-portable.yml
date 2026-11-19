@@ -65,6 +65,7 @@ jobs:
           # Package the untouched production executable, NOT the debugger-enabled test build.
           Copy-Item artifacts/production/frostmark.exe artifacts/Frostmark/Frostmark.exe
           Copy-Item PORTABLE-README.txt artifacts/Frostmark/README.txt
+          Copy-Item LICENSE artifacts/Frostmark/LICENSE.txt
           Copy-Item examples/welcome.md artifacts/Frostmark/Welcome.md
           Copy-Item artifacts/THIRD-PARTY-NOTICES.txt artifacts/Frostmark/THIRD-PARTY-NOTICES.txt
           Compress-Archive -Path artifacts/Frostmark -DestinationPath artifacts/Frostmark-windows-x64-portable.zip

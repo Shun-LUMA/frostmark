@@ -1,10 +1,10 @@
 # Frostmark
 
-A portable, read-only Markdown viewer for Windows 10/11 x64, built with Tauri 2, React and the installed Microsoft Edge WebView2 runtime.
+A free, MIT-licensed, portable, read-only Markdown viewer for Windows 10/11 x64, built with Tauri 2, React and the installed Microsoft Edge WebView2 runtime.
 
 ## Portable use
 
-Download the Windows artifact, extract the **inner** ZIP to a writable folder and run `Frostmark.exe`. No installation, elevation, registry modification or default-app takeover. WebView2 must already be installed. Preferences and WebView2 profile/cache stay beside the executable. Move the whole folder while closed.
+Download the `Frostmark-windows-x64-portable` artifact from a successful [Windows portable Actions run](https://github.com/Shun-LUMA/frostmark/actions/workflows/windows-portable.yml) (GitHub sign-in required), extract the **inner** ZIP to a writable folder and run `Frostmark.exe`. No installation, elevation, registry modification or default-app takeover. WebView2 must already be installed. Preferences and WebView2 profile/cache stay beside the executable. Move the whole folder while closed.
 
 See [portable instructions](PORTABLE-README.txt) for shortcuts, requirements, safety restrictions, file handling and unsigned-build warnings.
 
@@ -48,4 +48,12 @@ gh run list --workflow windows-portable.yml
 gh run download RUN_ID -n Frostmark-windows-x64-portable
 ```
 
-Lockfiles are committed. This is an unsigned personal-use build, not a signed or externally audited commercial release.
+Lockfiles are committed. Current builds are unsigned and have not undergone an external security audit. Open-source availability does not itself provide code signing or guarantee Windows SmartScreen reputation.
+
+## Contributing
+
+Issues and pull requests are welcome. For frontend changes, run `npm run build` and `npx playwright test` (the browser tests use installed Microsoft Edge). For native changes, also run `cargo test --manifest-path src-tauri/Cargo.toml --locked --release --features custom-protocol` on Windows with the build prerequisites above. Do not commit personal documents, credentials, signing keys, or generated browser profiles. The npm package's `private: true` setting only prevents accidental npm publication; the source repository is public.
+
+## License
+
+Copyright (c) 2026 Shun-LUMA and Frostmark contributors. Frostmark's original source code is licensed under the [MIT License](LICENSE). Third-party dependencies retain their respective licenses; portable builds include `THIRD-PARTY-NOTICES.txt`. Microsoft Edge WebView2 is a separately installed system runtime and is not covered by Frostmark's MIT license.
