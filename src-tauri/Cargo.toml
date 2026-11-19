@@ -20,6 +20,8 @@ url = "2"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
+# Enables a debugger only in the separate CI test binary. Never package this feature.
+desktop-test = []
 
 [profile.release]
 strip = true

@@ -35,11 +35,6 @@ jobs:
           Invoke-WebRequest 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -OutFile "$env:RUNNER_TEMP/WebView2Setup.exe"
           $setup = Start-Process "$env:RUNNER_TEMP/WebView2Setup.exe" -ArgumentList '/silent','/install' -Wait -PassThru
           Write-Host "WebView2 bootstrapper exit code: $($setup.ExitCode)"
-          # WebView2's per-app policy is used only on this disposable runner.
-          # Some runner environments ignore child-process browser-argument overrides.
-          $debugPolicy = 'HKCU:\Software\Policies\Microsoft\Edge\WebView2\AdditionalBrowserArguments'
-          New-Item -Path $debugPolicy -Force | Out-Null
-          New-ItemProperty -Path $debugPolicy -Name 'frostmark.exe' -PropertyType String -Value '--remote-debugging-port=9222' -Force | Out-Null
       - name: Rust tests
         run: cargo test --manifest-path src-tauri/Cargo.toml --locked --release --features custom-protocol
       - name: Build portable executable (no installer)
@@ -53,6 +48,12 @@ jobs:
           retention-days: 3
       - name: Verify portable executable dependencies
         run: node scripts/verify-pe.mjs
+      - name: Build separate instrumented native test executable
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force artifacts/production | Out-Null
+          Copy-Item src-tauri/target/release/frostmark.exe artifacts/production/frostmark.exe
+          npm run tauri:build -- --no-bundle --features desktop-test
       - name: Desktop smoke test
         run: node scripts/desktop-smoke.mjs
       - name: Collect third-party notices
@@ -61,7 +62,8 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force artifacts/Frostmark | Out-Null
-          Copy-Item src-tauri/target/release/frostmark.exe artifacts/Frostmark/Frostmark.exe
+          # Package the untouched production executable, NOT the debugger-enabled test build.
+          Copy-Item artifacts/production/frostmark.exe artifacts/Frostmark/Frostmark.exe
           Copy-Item PORTABLE-README.txt artifacts/Frostmark/README.txt
           Copy-Item examples/welcome.md artifacts/Frostmark/Welcome.md
           Copy-Item artifacts/THIRD-PARTY-NOTICES.txt artifacts/Frostmark/THIRD-PARTY-NOTICES.txt

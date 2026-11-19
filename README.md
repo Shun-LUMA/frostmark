@@ -38,6 +38,8 @@ npm run tauri:build -- --no-bundle
 
 ## GitHub Actions
 
+The elevated hosted runner uses a separate `desktop-test` feature build for CDP automation because WebView2 may ignore debugger environment overrides when elevated. This feature explicitly enables port 9222 **only in the test binary**. The untouched production binary is preserved before instrumentation and is the only executable packaged. Ordinary local builds do not enable this feature; never distribute a `desktop-test` build.
+
 The Windows portable workflow builds on `windows-latest`, runs browser and Rust tests, verifies the x64 GUI executable's direct runtime imports, runs an actual WebView2 desktop smoke test, and uploads a portable ZIP plus SHA-256 checksum. The Visual C++ runtime is statically linked; WebView2 is supplied by the system. Dependency license notices are included in the ZIP. It runs on pushes to main and can be dispatched manually. It does **not** create a release or install anything on the user's machine. Artifacts expire after 30 days; keep a local copy.
 
 ```sh

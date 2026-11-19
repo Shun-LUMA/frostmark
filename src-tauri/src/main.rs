@@ -285,7 +285,7 @@ fn main() {
                 .ok_or("Cannot locate portable folder")?
                 .join("Frostmark.WebView2");
             std::fs::create_dir_all(&directory)?;
-            tauri::WebviewWindowBuilder::new(
+            let window = tauri::WebviewWindowBuilder::new(
                 app,
                 "main",
                 tauri::WebviewUrl::App("index.html".into()),
@@ -293,8 +293,12 @@ fn main() {
             .title("Frostmark")
             .inner_size(1200.0, 820.0)
             .min_inner_size(680.0, 480.0)
-            .data_directory(directory)
-            .build()?;
+            .data_directory(directory);
+            // Elevated CI runners can ignore WebView2 environment overrides.
+            // This instrumentation is absent from the distributed executable.
+            #[cfg(feature = "desktop-test")]
+            let window = window.additional_browser_args("--remote-debugging-port=9222");
+            window.build()?;
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
