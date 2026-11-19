@@ -35,6 +35,11 @@ jobs:
           Invoke-WebRequest 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -OutFile "$env:RUNNER_TEMP/WebView2Setup.exe"
           $setup = Start-Process "$env:RUNNER_TEMP/WebView2Setup.exe" -ArgumentList '/silent','/install' -Wait -PassThru
           Write-Host "WebView2 bootstrapper exit code: $($setup.ExitCode)"
+          # WebView2's per-app policy is used only on this disposable runner.
+          # Some runner environments ignore child-process browser-argument overrides.
+          $debugPolicy = 'HKCU:\Software\Policies\Microsoft\Edge\WebView2\AdditionalBrowserArguments'
+          New-Item -Path $debugPolicy -Force | Out-Null
+          New-ItemProperty -Path $debugPolicy -Name 'frostmark.exe' -PropertyType String -Value '--remote-debugging-port=9222' -Force | Out-Null
       - name: Rust tests
         run: cargo test --manifest-path src-tauri/Cargo.toml --locked --release --features custom-protocol
       - name: Build portable executable (no installer)
