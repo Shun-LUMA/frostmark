@@ -1,2 +1,21 @@
-import { defineConfig } from '@playwright/test';
-export default defineConfig({testDir:'./tests',timeout:30000,use:{baseURL:'http://localhost:1420',channel:'msedge',headless:true,viewport:{width:1280,height:900}},webServer:{command:'npm run dev -- --host 127.0.0.1',url:'http://localhost:1420',reuseExistingServer:false,timeout:30000},reporter:[['list'],['json',{outputFile:'test-results/browser-report.json'}]]});
+import { defineConfig } from "@playwright/test";
+export default defineConfig({
+  testDir: "./tests",
+  timeout: 30000,
+  use: {
+    baseURL: "http://localhost:1420",
+    channel: "msedge",
+    headless: true,
+    viewport: { width: 1280, height: 900 },
+  },
+  webServer: {
+    command: "npm run dev -- --host 127.0.0.1",
+    url: "http://localhost:1420",
+    reuseExistingServer: false,
+    timeout: 30000,
+  },
+  reporter: [
+    ["list"],
+    ["json", { outputFile: "test-results/browser-report.json" }],
+  ],
+});

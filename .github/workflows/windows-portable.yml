@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    tags: ['v*']
+    tags: ["v*"]
 permissions:
   contents: read
 concurrency:
@@ -25,9 +25,11 @@ jobs:
           workspaces: src-tauri -> target
       - run: npm ci
       - name: Frontend checks
-        run: npm run build
+        run: |
+          npm run build
+          npx playwright test
       - name: Rust tests
-        run: cargo test --manifest-path src-tauri/Cargo.toml --locked
+        run: cargo test --manifest-path src-tauri/Cargo.toml --locked --release
       - name: Build portable executable (no installer)
         run: npm run tauri:build -- --no-bundle
       - name: Desktop smoke test
